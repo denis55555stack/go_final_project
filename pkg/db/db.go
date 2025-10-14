@@ -24,11 +24,11 @@ var db *sql.DB
 // Init инициализирует соединение с базой данных и схему.
 func Init(dbFile string) error {
 	var install bool
-	log.Printf("Попытка инициализации базы данных: %s", dbFile)
+	log.Printf("попытка инициализации базы данных: %s", dbFile)
 
 	// Проверяем, существует ли файл базы данных.
 	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
-		log.Println("Файла базы данных не существует, будет создан.")
+		log.Println("файла базы данных не существует, будет создан.")
 		install = true
 	} else if err != nil {
 		return fmt.Errorf("ошибка проверки файла %v", err)
@@ -40,23 +40,23 @@ func Init(dbFile string) error {
 	if err != nil {
 		return fmt.Errorf("ошибка открытия базы данных %v", err)
 	}
-	log.Println("Соединение с базой данных установлено.")
+	log.Println("соединение с базой данных установлено.")
 
 	// Проверяем, работает ли соединение с базой данных.
 	if err := db.Ping(); err != nil {
 		return fmt.Errorf("ошибка подключения к базе данных %v", err)
 	}
-	log.Println("Успешное подключение к базе данных")
+	log.Println("успешное подключение к базе данных")
 
 	// Устанавливаем схему, если необходимо.
 	if install {
-		log.Println("Создание схемы базы данных...")
+		log.Println("создание схемы базы данных...")
 		if _, err := db.Exec(schema); err != nil {
 			return fmt.Errorf("ошибка создания схемы %v", err)
 		}
-		log.Println("Схема базы данных успешно создана.")
+		log.Println("схема базы данных успешно создана.")
 	} else {
-		log.Println("Схема базы данных уже существует (файл БД найден).")
+		log.Println("схема базы данных уже существует (файл БД найден).")
 	}
 
 	return nil

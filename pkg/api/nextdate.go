@@ -66,7 +66,7 @@ func NextDateHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		now, err = time.Parse("20060102", nowStr)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("недействительный now параметр: %v", err), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("недействительный параметр now: %v", err), http.StatusBadRequest)
 			return
 		}
 	}

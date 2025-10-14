@@ -34,6 +34,7 @@ func checkDate(task *db.Task) error {
 		return errors.New("некорректный формат даты")
 	}
 	log.Println("Формат даты нормальный")
+
 	// Проверяем правило повторения
 	if task.Repeat != "" {
 		next, err := NextDate(now, task.Date, task.Repeat)
@@ -58,12 +59,12 @@ func checkDate(task *db.Task) error {
 	if !t.After(now) {
 		task.Date = now.Format("20060102")
 	}
-	log.Println("Ошибок нет")
+	log.Println("ошибок нет")
 
 	return nil
 }
 
-// TaskHandler handles both Post and Put requests for /api/task
+// TaskHandler обрабатывает запросы Post, Put, Get и Delete для /api/task
 func TaskHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
@@ -75,11 +76,11 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodDelete:
 		DeleteTaskHandler(w, r)
 	default:
-		http.Error(w, "Неверный метод", http.StatusMethodNotAllowed)
+		http.Error(w, "неверный метод", http.StatusMethodNotAllowed)
 	}
 }
 
-// addTaskHandle — обработчик POST /api/task
+// Обработчик для добавления задачи
 func AddTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "неверный метод", http.StatusMethodNotAllowed)
@@ -90,7 +91,7 @@ func AddTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&task)
 	if err != nil {
-		log.Printf("Ошибка десериализации JSON: %v", err)
+		log.Printf("ошибка десериализации JSON: %v", err)
 		writeJson(w, map[string]string{"error": "ошибка десериализации JSON"})
 		return
 	}
@@ -123,13 +124,12 @@ func AddTaskHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Обработчик для редактирования задачи
-
 func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 
 	err := json.NewDecoder(r.Body).Decode(&task)
 	if err != nil {
-		log.Printf("Ошибка десериализации JSON: %v", err)
+		log.Printf("ошибка десериализации JSON: %v", err)
 		writeJson(w, map[string]string{"error": "ошибка десериализации JSON"})
 		return
 	}
@@ -165,7 +165,6 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Обработчик для получения списка задач
-
 type TasksResp struct {
 	Tasks []*db.Task `json:"tasks"`
 }
@@ -174,7 +173,7 @@ func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 	tasks, err := db.Tasks(50) // Максимальное количество записей = 50
 	if err != nil {
 		log.Printf("Ошибка получения задач из БД: %v", err)
-		writeJson(w, map[string]string{"error": "Ошибка получения задач из базы данных"})
+		writeJson(w, map[string]string{"error": "ошибка получения задач из базы данных"})
 		return
 	}
 
@@ -192,72 +191,71 @@ func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 func GetTaskHandlerId(w http.ResponseWriter, r *http.Request) {
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
-		writeJson(w, map[string]string{"error": "Не указан идентификатор"})
+		writeJson(w, map[string]string{"error": "не указан идентификатор"})
 		return
 	}
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		writeJson(w, map[string]string{"error": "Некорректный идентификатор"})
+		writeJson(w, map[string]string{"error": "некорректный идентификатор"})
 		return
 	}
 
 	task, err := db.GetTask(id)
 	if err != nil {
-		log.Printf("Ошибка получения задачи из БД: %v", err)
-		writeJson(w, map[string]string{"error": "Задача не найдена"})
+		log.Printf("ошибка получения задачи из БД: %v", err)
+		writeJson(w, map[string]string{"error": "задача не найдена"})
 		return
 	}
 
 	writeJson(w, task)
 }
 
-// DeleteTaskHandler обрабатывает DELETE-запросы к /api/task
+// Обработчик для удаления задач
 func DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
-		writeJson(w, map[string]string{"error": "Отсутствует параметр id"})
+		writeJson(w, map[string]string{"error": "тсутствует параметр id"})
 		return
 	}
 
 	err := db.DeleteTask(idStr)
 	if err != nil {
-		writeJson(w, map[string]string{"error": "Не удалось удалить задачу"})
+		writeJson(w, map[string]string{"error": "не удалось удалить задачу"})
 		return
 	}
 
 	writeJson(w, map[string]string{}) // Пустой JSON
 }
 
-// DoneTaskHandler обрабатывает POST-запросы к /api/task/done
+// Обработчик для выполненной задачи
 func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
-
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
-		writeJson(w, map[string]string{"error": "Отсутствует параметр id"})
+		writeJson(w, map[string]string{"error": "отсутствует параметр id"})
 		return
 	}
 
 	// Преобразуем idStr в int
 	idInt, err := strconv.Atoi(idStr)
 	if err != nil {
-		writeJson(w, map[string]string{"error": "Недопустимый параметр идентификатора.. Значение должно быть целым числом."})
+		writeJson(w, map[string]string{"error": "недопустимый параметр идентификатора. значение должно быть целым числом."})
 		return
 
 	}
 
-	// Получить задачу из базы данных
+	// Получаем задачу из базы данных
 	task, err := db.GetTask(idInt)
 	if err != nil {
-		writeJson(w, map[string]string{"error": "Не удалось получить задачу"})
+		writeJson(w, map[string]string{"error": "не удалось получить задачу"})
 		return
 	}
 	// Удаляем, если отсутствует правило повторения
 	if task.Repeat == "" {
 		err = db.DeleteTask(idStr)
 		if err != nil {
-			writeJson(w, map[string]string{"error": "Не удалось удалить задачу"})
+			writeJson(w, map[string]string{"error": "не удалось удалить задачу"})
 			return
 		}
 	}
@@ -266,14 +264,14 @@ func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	nextDate, err := NextDate(nextDay, task.Date, task.Repeat)
 	if err != nil {
-		writeJson(w, map[string]string{"error": "Не удалось рассчитать следующую дату."})
+		writeJson(w, map[string]string{"error": "не удалось рассчитать следующую дату."})
 		return
 	}
 
 	// Обновить дату задачи
 	err = db.UpdateDate(nextDate, idStr) // Используем UpdateDate для обновления даты
 	if err != nil {
-		writeJson(w, map[string]string{"error": "Не удалось обновить дату задачи"})
+		writeJson(w, map[string]string{"error": "не удалось обновить дату задачи"})
 		return
 	}
 
