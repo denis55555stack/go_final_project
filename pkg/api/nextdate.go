@@ -22,7 +22,6 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 
 	if repeat == "y" {
 		current := startTime
-
 		for {
 			current = current.AddDate(1, 0, 0)
 			if current.After(now) {
@@ -45,6 +44,7 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 			if current.After(now) {
 				return current.Format(dateFormat), nil
 			}
+
 		}
 	} else if repeat == "w" || repeat == "m" {
 		return "", fmt.Errorf("неподдерживаемый формат")
@@ -64,9 +64,9 @@ func NextDateHandler(w http.ResponseWriter, r *http.Request) {
 	if nowStr == "" {
 		now = time.Now()
 	} else {
-		now, err = time.Parse("20060102", nowStr)
+		now, err = time.Parse("20060202", nowStr)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("недействительный параметр now: %v", err), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("недействительный now параметр: %v", err), http.StatusBadRequest)
 			return
 		}
 	}

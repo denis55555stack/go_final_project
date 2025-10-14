@@ -34,6 +34,7 @@ func AddTask(task *Task) (int64, error) {
 // Tasks возвращает список ближайших задач из базы данных.
 // limit - максимальное количество возвращаемых записей.
 func Tasks(limit int) ([]*Task, error) {
+
 	db := GetDB()
 	query := `SELECT id, date, title, comment, repeat FROM scheduler ORDER BY date ASC LIMIT ?` // Запрос с ограничением по количеству
 
@@ -58,10 +59,11 @@ func Tasks(limit int) ([]*Task, error) {
 
 	err = rows.Err()
 	if err != nil {
-		log.Printf("Ошибка после итерации: %v", err)
+		log.Printf("ошибка после итерации: %v", err)
 		return nil, err
 	}
 
+	// возвращаем пустой слайс
 	if tasks == nil {
 		tasks = []*Task{}
 	}
@@ -74,6 +76,7 @@ var err error
 // GetTask возвращает задачу по указанному id.
 func GetTask(id int) (*Task, error) {
 	db := GetDB()
+	err = nil
 	if err != nil {
 		log.Printf("ошибка подключения к БД: %v", err)
 		return nil, err
@@ -117,7 +120,7 @@ func UpdateTask(task *Task) error {
 	}
 
 	if count == 0 {
-		err := fmt.Errorf("задача с id %s не найдена для обновления", task.ID)
+		err := fmt.Errorf("задача с id %s для обновления не найдена", task.ID)
 		log.Println(err)
 		return err
 	}
@@ -165,7 +168,7 @@ func UpdateDate(next string, id string) error {
 	}
 
 	if count == 0 {
-		err := fmt.Errorf("задача с id %s не найдена для обновления", id)
+		err := fmt.Errorf("задача с id %s для обновления не найдена", id)
 		log.Println(err)
 		return err
 	}

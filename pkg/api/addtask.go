@@ -34,7 +34,6 @@ func checkDate(task *db.Task) error {
 		return errors.New("некорректный формат даты")
 	}
 	log.Println("Формат даты нормальный")
-
 	// Проверяем правило повторения
 	if task.Repeat != "" {
 		next, err := NextDate(now, task.Date, task.Repeat)
@@ -91,12 +90,12 @@ func AddTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&task)
 	if err != nil {
-		log.Printf("ошибка десериализации JSON: %v", err)
+		log.Printf("Ошибка десериализации JSON: %v", err) // Log the error
 		writeJson(w, map[string]string{"error": "ошибка десериализации JSON"})
 		return
 	}
 
-	log.Println("Разобрал сообщение. Иду дальше", task)
+	log.Println("разобрал сообщение. Иду дальше", task)
 
 	// Проверка обязательного поля Title
 	if task.Title == "" {
@@ -124,6 +123,7 @@ func AddTaskHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Обработчик для редактирования задачи
+
 func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 	var task db.Task
 
@@ -161,10 +161,11 @@ func UpdateTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJson(w, map[string]string{}) // Возвращаем пустой JSON
+	writeJson(w, map[string]any{}) // Возвращаем пустой JSON
 }
 
 // Обработчик для получения списка задач
+
 type TasksResp struct {
 	Tasks []*db.Task `json:"tasks"`
 }
@@ -172,7 +173,7 @@ type TasksResp struct {
 func GetTasksHandler(w http.ResponseWriter, r *http.Request) {
 	tasks, err := db.Tasks(50) // Максимальное количество записей = 50
 	if err != nil {
-		log.Printf("Ошибка получения задач из БД: %v", err)
+		log.Printf("ошибка получения задач из БД: %v", err)
 		writeJson(w, map[string]string{"error": "ошибка получения задач из базы данных"})
 		return
 	}
@@ -216,7 +217,7 @@ func DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
-		writeJson(w, map[string]string{"error": "тсутствует параметр id"})
+		writeJson(w, map[string]string{"error": "отсутствует параметр id"})
 		return
 	}
 
@@ -226,11 +227,12 @@ func DeleteTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJson(w, map[string]string{}) // Пустой JSON
+	writeJson(w, map[string]any{}) // Пустой JSON
 }
 
 // Обработчик для выполненной задачи
 func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
+
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
 		writeJson(w, map[string]string{"error": "отсутствует параметр id"})
@@ -240,12 +242,12 @@ func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
 	// Преобразуем idStr в int
 	idInt, err := strconv.Atoi(idStr)
 	if err != nil {
-		writeJson(w, map[string]string{"error": "недопустимый параметр идентификатора. значение должно быть целым числом."})
+		writeJson(w, map[string]string{"error": "Недопустимый параметр идентификатора.. Значение должно быть целым числом."})
 		return
 
 	}
 
-	// Получаем задачу из базы данных
+	// Получить задачу из базы данных
 	task, err := db.GetTask(idInt)
 	if err != nil {
 		writeJson(w, map[string]string{"error": "не удалось получить задачу"})
@@ -256,8 +258,10 @@ func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
 		err = db.DeleteTask(idStr)
 		if err != nil {
 			writeJson(w, map[string]string{"error": "не удалось удалить задачу"})
-			return
+			//return
 		}
+		writeJson(w, map[string]any{}) ////
+		return
 	}
 
 	nextDay := time.Now().AddDate(0, 0, 1)
@@ -275,6 +279,6 @@ func DoneTaskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	writeJson(w, map[string]string{}) // Пустой JSON
+	writeJson(w, map[string]any{}) // Пустой JSON
 
 }

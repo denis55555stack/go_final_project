@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"go1f/pkg/api"
 	"go1f/pkg/db"
-	"go1f/pkg/server"
 	"log"
+
+	"go1f/pkg/server"
+
+	"github.com/Yandex-Practicum/go_final_project/pkg/api"
 )
 
 func main() {
@@ -21,7 +23,7 @@ func main() {
 	// Иницилизируем Api
 	api.Init()
 
-	// Запускаем сервер
+	//Запускаем сервер
 	log.Println("Запуск сервера.")
 	if err := server.Run(); err != nil {
 		fmt.Printf("Ошибка при запуске сервера: %v", err)
