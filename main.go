@@ -12,6 +12,7 @@ import (
 
 func main() {
 
+	// Создаем базу данных
 	dbFile := "scheduler.db"
 
 	if err := db.Init(dbFile); err != nil {
@@ -19,6 +20,7 @@ func main() {
 	}
 	log.Println("База данных успешно инициализирована.")
 
+	// Иницилизируем Api
 	api.Init()
 
 	//Запускаем сервер
